@@ -2,15 +2,24 @@ import smtplib
 from email.mime.text import MIMEText
 
 
-def send_email(recipient, message):
+def send_email(recipient):
     sender = ""  # Your email
     password = ""  # Your password
 
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
+
+    try:
+        with open("email_template.html") as file:
+            template = file.read()
+    except IOError:
+        return "The template file doesn`t found"
+
     try:
         server.login(sender, password)
-        msg = MIMEText(message)
+        msg = MIMEText(template, "html")
+        msg["From"] = sender
+        msg["To"] = recipient
         msg["Subject"] = "CLICK ME PLEASE!"
         server.sendmail(sender, recipient, msg.as_string())
 
@@ -21,8 +30,7 @@ def send_email(recipient, message):
 
 def main():
     recipient = input("Type email")
-    message = input("Type your message")
-    print(send_email(recipient=recipient, message=message))
+    print(send_email(recipient=recipient))
 
 
 if __name__ == "__main__":
